@@ -1,0 +1,11 @@
+[
+  {
+    "id": "example_slope_1",
+    "name": "Example Slope - North Aspect",
+    "lat": 39.6403,
+    "lon": -106.3742,
+    "elevation_m": 3400,
+    "aspect_deg": 0,
+    "notes": "Replace with your real coordinates. Aspect: 0=N, 90=E, 180=S, 270=W"
+  }
+]

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Avalanche Forecast</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    h1 { color: #f8fafc; }
+    .card {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .status { font-size: 0.9em; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <h1>Avalanche Forecast</h1>
+  <p class="status">This page will display daily forecast results once the pipeline is running.</p>
+
+  <div id="results">
+    <div class="card">No data yet — pipeline not connected.</div>
+  </div>
+
+  <script>
+    // Later: fetch('../data/results.json') and render real forecast cards here.
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+name: Daily Avalanche Forecast Run
+
+# Runs automatically every day, and also lets you trigger it manually
+# from the "Actions" tab on GitHub for testing.
+on:
+  schedule:
+    - cron: "0 6 * * *"   # 6:00 AM UTC every day - adjust as you like
+  workflow_dispatch: {}    # allows manual "Run workflow" button in GitHub UI
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Set up CDS API credentials
+        run: |
+          echo "url: ${{ secrets.CDSAPI_URL }}" > ~/.cdsapirc
+          echo "key: ${{ secrets.CDSAPI_KEY }}" >> ~/.cdsapirc
+
+      - name: Fetch today's ERA5 data
+        run: python scripts/fetch_era5.py --date $(date -u +%Y-%m-%d)
+
+      # Later steps (added as we build them):
+      # - Convert ERA5 data to .smet format
+      # - Run SNOWPACK
+      # - Parse .pro output to JSON
+      # - Commit results back to the repo
+
+      - name: Commit and push updated data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Automated daily data update" || echo "No changes to commit"
+          git push
