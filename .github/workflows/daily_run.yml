@@ -28,8 +28,8 @@ jobs:
           echo "url: ${{ secrets.CDSAPI_URL }}" > ~/.cdsapirc
           echo "key: ${{ secrets.CDSAPI_KEY }}" >> ~/.cdsapirc
 
-      - name: Fetch today's ERA5 data
-        run: python scripts/fetch_era5.py --date $(date -u +%Y-%m-%d)
+      - name: Fetch latest available ERA5 data
+        run: python scripts/fetch_era5.py
 
       # Later steps (added as we build them):
       # - Convert ERA5 data to .smet format

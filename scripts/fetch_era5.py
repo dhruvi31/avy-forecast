@@ -27,9 +27,15 @@ import argparse
 import json
 import os
 import sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import cdsapi
+
+# ERA5-Land is published with a delay of roughly 5-7 days.
+# Requesting "today" will always fail with a "data not available yet" error,
+# so by default we fetch data from this many days ago instead.
+DEFAULT_LAG_DAYS = 7
 
 # Variables needed as SNOWPACK forcing input
 ERA5_VARIABLES = [
@@ -79,7 +85,7 @@ def fetch_for_location(client, location, date_str):
             "day": date_str[8:10],
             "time": [f"{h:02d}:00" for h in range(24)],
             "area": area,
-            "format": "netcdf",
+            "data_format": "netcdf",
         },
         str(output_file),
     )
@@ -92,10 +98,20 @@ def main():
     parser = argparse.ArgumentParser(description="Fetch ERA5-Land data for slope locations.")
     parser.add_argument(
         "--date",
-        required=True,
-        help="Date to fetch, format YYYY-MM-DD (e.g. 2026-07-10)",
+        required=False,
+        default=None,
+        help=(
+            "Date to fetch, format YYYY-MM-DD. If omitted, defaults to "
+            f"{DEFAULT_LAG_DAYS} days before today, since ERA5-Land data "
+            "is published with a delay."
+        ),
     )
     args = parser.parse_args()
+
+    if args.date is None:
+        target_date = datetime.utcnow() - timedelta(days=DEFAULT_LAG_DAYS)
+        args.date = target_date.strftime("%Y-%m-%d")
+        print(f"No --date given, defaulting to {args.date} (today minus {DEFAULT_LAG_DAYS} days)")
 
     try:
         client = cdsapi.Client()
