@@ -31,8 +31,10 @@ jobs:
       - name: Fetch latest available ERA5 data
         run: python scripts/fetch_era5.py
 
+      - name: Convert ERA5 data to .smet format
+        run: python scripts/convert_to_smet.py
+
       # Later steps (added as we build them):
-      # - Convert ERA5 data to .smet format
       # - Run SNOWPACK
       # - Parse .pro output to JSON
       # - Commit results back to the repo
