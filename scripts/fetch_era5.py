@@ -86,6 +86,7 @@ def fetch_for_location(client, location, date_str):
             "time": [f"{h:02d}:00" for h in range(24)],
             "area": area,
             "data_format": "netcdf",
+            "download_format": "unarchived",
         },
         str(output_file),
     )

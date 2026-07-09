@@ -24,6 +24,7 @@ Usage:
 import argparse
 import json
 import math
+import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -36,6 +37,24 @@ RAW_DATA_DIR = REPO_ROOT / "data" / "raw"
 SMET_DATA_DIR = REPO_ROOT / "data" / "smet"
 
 NODATA_VALUE = -999
+
+
+def ensure_netcdf(nc_file: Path) -> Path:
+    """
+    Some CDS API responses come back as a .zip archive containing the
+    actual .nc file, even when the file has a .nc extension. Detect this
+    and extract the real NetCDF file if needed.
+    """
+    if zipfile.is_zipfile(nc_file):
+        extract_dir = nc_file.parent / f"{nc_file.stem}_extracted"
+        extract_dir.mkdir(exist_ok=True)
+        with zipfile.ZipFile(nc_file, "r") as zf:
+            zf.extractall(extract_dir)
+            nc_names = [n for n in zf.namelist() if n.endswith(".nc")]
+        if not nc_names:
+            raise ValueError(f"No .nc file found inside archive: {nc_file}")
+        return extract_dir / nc_names[0]
+    return nc_file
 
 
 def load_locations():
@@ -76,7 +95,7 @@ def convert_location(location, date_str):
 
     print(f"Converting '{location['name']}' for {date_str}...")
 
-    ds = xr.open_dataset(nc_file)
+    ds = xr.open_dataset(ensure_netcdf(nc_file))
 
     # Find the grid point closest to the exact location
     target_lat = location["lat"]
